@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.actuate.istudio.analysis.model:Project xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:com.actuate.istudio.analysis.model="http:///com.actuate.istudio.analysis.model.ecore" name="TextMining">
+  <files xsi:type="com.actuate.istudio.analysis.model:DataDesign" name="TextMining.datadesign" path="/TextMining/Data Objects/TextMining.datadesign">
+    <dataSets name="Concepts">
+      <columns name="doc_id"/>
+      <columns name="id"/>
+      <columns name="name"/>
+      <columns name="frequency"/>
+      <columns name="relevancy"/>
+      <columns name="is_complex"/>
+    </dataSets>
+    <dataSets name="Categories">
+      <columns name="doc_id"/>
+      <columns name="id"/>
+      <columns name="kb_name"/>
+      <columns name="categoryid"/>
+      <columns name="category"/>
+      <columns name="category_index"/>
+      <columns name="id_1"/>
+      <columns name="weight"/>
+      <columns name="kb_relevancy"/>
+      <columns name="is_rejected"/>
+    </dataSets>
+    <dataSets name="Entities">
+      <columns name="doc_id"/>
+      <columns name="id"/>
+      <columns name="cartridge"/>
+      <columns name="entity"/>
+      <columns name="term_index"/>
+      <columns name="confidence_score"/>
+      <columns name="relevancy_score"/>
+      <columns name="frequency"/>
+    </dataSets>
+    <dataSets name="Sentiment">
+      <columns name="doc_id"/>
+      <columns name="id"/>
+      <columns name="tone"/>
+      <columns name="positive_tone_score"/>
+      <columns name="negative_tone_score"/>
+      <columns name="subjectivity"/>
+      <columns name="subjectivity_score"/>
+    </dataSets>
+    <dataSets name="Sentence Sentiments">
+      <columns name="doc_id"/>
+      <columns name="id"/>
+      <columns name="tone"/>
+      <columns name="sentiment_index"/>
+      <columns name="positive_tone_score"/>
+      <columns name="negative_tone_score"/>
+      <columns name="subjectivity"/>
+      <columns name="subjectivity_score"/>
+      <columns name="sentence"/>
+    </dataSets>
+    <dataSets name="Language">
+      <columns name="doc_id"/>
+      <columns name="id"/>
+      <columns name="name"/>
+      <columns name="confidence_score"/>
+    </dataSets>
+  </files>
+  <files xsi:type="com.actuate.istudio.analysis.model:Data" name="TextMining.data" path="/TextMining/Data Objects/TextMining.data"/>
+</com.actuate.istudio.analysis.model:Project>
