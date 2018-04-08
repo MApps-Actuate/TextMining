@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 4.7.0.v201707031807</property>
+    <property name="units">in</property>
+    <property name="theme">ThemesReportItems31.Modern</property>
+    <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <property name="imageDPI">96</property>
+    <list-property name="libraries">
+        <structure>
+            <property name="fileName">/ThemesReportItems31.rptlibrary</property>
+            <property name="namespace">ThemesReportItems31</property>
+        </structure>
+    </list-property>
+    <parameters>
+        <scalar-parameter name="Tone" id="200">
+            <property name="valueType">dynamic</property>
+            <expression name="valueExpr" type="javascript">dataSetRow["tone"]</expression>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="linkedDataModelName">Text Mining Data Model</property>
+            <property name="paramType">multi-value</property>
+            <property name="controlType">list-box</property>
+            <property name="mustMatch">true</property>
+            <property name="fixedOrder">true</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <data-mart-data-source name="Data Source" id="4">
+            <property name="datamartURL">Data Objects/TextMining</property>
+            <property name="accessType">latest</property>
+        </data-mart-data-source>
+    </data-sources>
+    <property name="linkedDataModels">
+        <data-mart-linked-data-model name="Text Mining Data Model" id="219">
+            <property name="dataSource">Data Source</property>
+            <property name="dataObject">Data Model</property>
+        </data-mart-linked-data-model>
+    </property>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="orientation">auto</property>
+            <page-footer>
+                <text id="3">
+                    <property name="contentType">html</property>
+                    <text-property name="content"><![CDATA[<value-of>new Date()</value-of>]]></text-property>
+                </text>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <extended-item extensionName="HTMLControl" id="169">
+            <method name="clientOnCreate"><![CDATA[var config = {
+
+	wordColumn : "name",
+	wordSize: "ConceptCount",
+	min:100000000,
+	max:0,
+	
+	/* the total number of word to display */
+	wordCount : 150
+};
+
+// If data binding is used, the data should be saved and transformed in order
+// to fit the Word Cloud Chart map.
+function dataTransfrom(cursor) {
+	var rows = [];
+	var count = 0;
+	while (cursor.hasNext()) {
+		if(config.wordCount != null &amp;&amp; count >= config.wordCount){
+			break;
+		}
+		var dataObj = cursor.next();
+		rows.push({word: dataObj[config.wordColumn], value: dataObj[config.wordSize]});
+		count++;
+		if (config.min> dataObj[config.wordSize])
+			config.min = dataObj[config.wordSize];
+		if (config.max < dataObj[config.wordSize])
+			config.max = dataObj[config.wordSize];
+	}
+	return rows;
+}
+
+var containerId = this.getId();
+
+var data = dataTransfrom(this.getDataCursor());
+
+window["__draw_word_cloud"] = function(containerId, data, min, max) {
+	//var colors = ["#4D4D4D", "#989898","#b8b8b8"];
+	var colors = ["#9ecc4c", "#db462e", "#66b0d1", "#f4d760", "#c9112f", "#2e988c", "#f4ac45", "#3578ad","#f29682","#2c8e3c"];
+	var typeSize = [14, 18, 24, 32, 40, 48, 60, 72, 96, 128, 144];
+	var containerWidth = $("#" + containerId).width();
+	var containerHeight = $("#" + containerId).height();
+	
+	var fill = d3.scale.linear()
+	        .domain([max, max * 0.7, min])
+            .range(colors);
+
+	d3.layout.cloud().size([ containerWidth, containerHeight ]).words(
+			data.map(function(row) {
+				var idx = (row.value == max) ? typeSize.length : Math.floor(row.value / ((max - min) / typeSize.length));
+				return {
+					text : row.word,
+					size : typeSize[idx - 1]
+				};
+			})).padding(5).rotate(function() {
+		return 0;
+	}).font("Lato").fontSize(function(d) {
+		return d.size;
+	}).on("end", draw).start();
+
+
+	function draw(words) {
+		$("#" + containerId + " svg").remove();
+		d3.select("#" + containerId).append("svg")
+				.attr("width", containerWidth).attr("height", containerHeight).attr("class","wordcloud")
+				.append("g").attr(
+						"transform",
+						"translate(" + containerWidth / 2 + ","
+								+ containerHeight / 2 + ")").selectAll("text")
+				.data(words).enter().append("text").style("font-size", function(d) {
+							return d.size + "px";
+						}).style("font-family", "Lato").style("font-size",function(d){
+							return d.size + "px";
+						}).style("fill", function(d, i) {
+							return fill(data[i].value);
+						}).attr("text-anchor", "middle").attr("transform", function(d) {
+							return "translate(" + [ d.x, d.y ] + ") rotate("
+									+ d.rotate + ")";
+						}).text(function(d) {
+					return d.text;
+				});
+	}
+}
+
+window["__data"] = data;
+window["__containerId"] = containerId;
+
+var downloadURL = 'js/d3-cloud-master/d3.layout.cloud.js';
+head.load('https://d3js.org/d3.v2.min.js', this.getBirtResourceURL(downloadURL), function() {
+	__draw_word_cloud(containerId, data, config.min, config.max);
+});
+
+]]></method>
+            <property name="groups">
+                <data-group>
+                    <property name="groupName">ConceptGroup</property>
+                    <expression name="keyExpr" type="javascript">data["name"]</expression>
+                    <property name="interval">none</property>
+                    <property name="sortDirection">asc</property>
+                </data-group>
+            </property>
+            <list-property name="filter">
+                <structure>
+                    <property name="operator">top-n</property>
+                    <expression name="expr" type="javascript">row["ConceptCount"]</expression>
+                    <simple-property-list name="value1">
+                        <value>150</value>
+                    </simple-property-list>
+                    <property name="updateAggregation">true</property>
+                </structure>
+                <structure>
+                    <property name="operator">in</property>
+                    <expression name="expr" type="javascript">row["tone"]</expression>
+                    <simple-property-list name="value1">
+                        <value>params["Tone"].value</value>
+                    </simple-property-list>
+                    <property name="updateAggregation">true</property>
+                </structure>
+            </list-property>
+            <property name="summaryData">true</property>
+            <property name="height">480px</property>
+            <property name="width">100%</property>
+            <expression name="bookmark" type="javascript">"CustomerFeedbackWordCloudComplexConcepts"</expression>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">name</property>
+                    <text-property name="displayName">name</text-property>
+                    <expression name="expression" type="javascript">BirtStr.toLower(dataSetRow["name"]);</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">ConceptCount</property>
+                    <text-property name="displayName">ConceptCount</text-property>
+                    <property name="dataType">integer</property>
+                    <simple-property-list name="aggregateOn">
+                        <value>ConceptGroup</value>
+                    </simple-property-list>
+                    <property name="aggregateFunction">COUNT</property>
+                    <list-property name="arguments">
+                        <structure>
+                            <property name="name">Expression</property>
+                            <expression name="value" type="javascript">row["name"]</expression>
+                        </structure>
+                    </list-property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">tone</property>
+                    <text-property name="displayName">tone</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["tone"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+            </list-property>
+            <property name="linkedDataModel">Text Mining Data Model</property>
+        </extended-item>
+    </body>
+</report>
