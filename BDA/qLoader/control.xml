@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<control>
+<load>1</load>
+<transform>1</transform>
+<runpostloading>1</runpostloading>
+<notify>0</notify>
+<sample>0</sample>
+<table failonerror="1" ignore="0"><database>TextMining</database><name>Document</name><desc/><action>create</action><format>rdbms</format><overwrite>1</overwrite><srcid>1</srcid><sql_query>select * from document where repository_id = '15'</sql_query><rdbms_options/><definition>0.xml</definition><rdbms_source>postgresql</rdbms_source><connection_string>mag-app-pipeline.eastus.cloudapp.azure.com,5432@magellan</connection_string><username>maguser</username><password>MAGMagellan</password></table>
+<table failonerror="1" ignore="0"><database>TextMining</database><name>Concepts</name><desc/><action>create</action><format>rdbms</format><overwrite>0</overwrite><srcid>1</srcid><sql_query>select d.doc_id, substring(t.name from 1 for position('.' in t.name)-1) as id, c.name, c.frequency, c.relevancy, c.is_complex
+from document d, document_metadata_attributes t, ca_concept c
+where d.doc_id=t.doc_id
+and d.doc_id=c.doc_id
+/*and d.repository_id = ? */</sql_query><rdbms_options/><definition>1.xml</definition><rdbms_source>postgresql</rdbms_source><connection_string>mag-app-pipeline.eastus.cloudapp.azure.com,5432@magellan</connection_string><username>maguser</username><password>MAGMagellan</password></table>
+<table failonerror="1" ignore="0"><database>TextMining</database><name>Categories</name><desc/><action>create</action><format>rdbms</format><overwrite>1</overwrite><srcid>1</srcid><sql_query>select d.doc_id, substring(t.name from 1 for position('.' in t.name)-1) as id, c.kb_name, c.id as categoryid, 
+case when kb_name = 'BusinessFinance' then initcap(c.name) when kb_name = 'ICB' then initcap(substring(c.name from 6)) else initcap(substring(c.name from position('-' in c.name)+2)) end as category,
+c.category_index, c.id, c.weight, c.kb_relevancy, c.is_rejected
+from document d, document_metadata_attributes t, ca_category c
+where d.doc_id=t.doc_id
+and d.doc_id=c.doc_id
+/*and d.repository_id = ? */</sql_query><rdbms_options/><definition>2.xml</definition><rdbms_source>postgresql</rdbms_source><connection_string>mag-app-pipeline.eastus.cloudapp.azure.com,5432@magellan</connection_string><username>maguser</username><password>MAGMagellan</password></table>
+<table failonerror="1" ignore="0"><database>TextMining</database><name>Entities</name><desc/><action>create</action><format>rdbms</format><overwrite>0</overwrite><srcid>1</srcid><sql_query>select d.doc_id, substring(t.name from 1 for position('.' in t.name)-1) as id, s.cartridge, case when s.main_term_value is not null then s.main_term_value else s.normalized_name end as entity, s.term_index, s.confidence_score, s.relevancy_score, s.frequency
+from document d, document_metadata_attributes t, ca_term s
+where d.doc_id=t.doc_id
+and d.doc_id=s.doc_id
+/*and d.repository_id = ? */</sql_query><rdbms_options/><definition>3.xml</definition><rdbms_source>postgresql</rdbms_source><connection_string>mag-app-pipeline.eastus.cloudapp.azure.com,5432@magellan</connection_string><username>maguser</username><password>MAGMagellan</password></table>
+<table failonerror="1" ignore="0"><database>TextMining</database><name>Sentiment</name><desc/><action>create</action><format>rdbms</format><overwrite>0</overwrite><srcid>1</srcid><sql_query>select d.doc_id, substring(t.name from 1 for position('.' in t.name)-1) as id, s.tone, s.positive_tone_score, s.negative_tone_score, s.subjectivity, s.subjectivity_score
+from document d, document_metadata_attributes t, ca_document_sentiments s
+where d.doc_id=t.doc_id
+and d.doc_id=s.doc_id
+/*and d.repository_id = ? */</sql_query><rdbms_options/><definition>4.xml</definition><rdbms_source>postgresql</rdbms_source><connection_string>mag-app-pipeline.eastus.cloudapp.azure.com,5432@magellan</connection_string><username>maguser</username><password>MAGMagellan</password></table>
+<table failonerror="1" ignore="0"><database>TextMining</database><name>Sentence Sentiments</name><desc/><action>create</action><format>rdbms</format><overwrite>0</overwrite><srcid>1</srcid><sql_query>select d.doc_id, substring(t.name from 1 for position('.' in t.name)-1) as id, s.tone, s.sentiment_index, s.positive_tone_score, s.negative_tone_score, s.subjectivity, s.subjectivity_score, s.sentence
+from document d, document_metadata_attributes t, ca_sentence_sentiments s
+where d.doc_id=t.doc_id
+and d.doc_id=s.doc_id
+/*and d.repository_id = ? */</sql_query><rdbms_options/><definition>5.xml</definition><rdbms_source>postgresql</rdbms_source><connection_string>mag-app-pipeline.eastus.cloudapp.azure.com,5432@magellan</connection_string><username>maguser</username><password>MAGMagellan</password></table>
+<table failonerror="1" ignore="0"><database>TextMining</database><name>Language</name><desc/><action>create</action><format>rdbms</format><overwrite>0</overwrite><srcid>1</srcid><sql_query>select d.doc_id, substring(t.name from 1 for position('.' in t.name)-1) as id, l.name, l.confidence_score
+from document d, document_metadata_attributes t, language l
+where d.doc_id=t.doc_id
+and d.doc_id=l.doc_id
+/*and d.repository_id = ? */</sql_query><rdbms_options/><definition>6.xml</definition><rdbms_source>postgresql</rdbms_source><connection_string>mag-app-pipeline.eastus.cloudapp.azure.com,5432@magellan</connection_string><username>maguser</username><password>MAGMagellan</password></table>
+</control>
